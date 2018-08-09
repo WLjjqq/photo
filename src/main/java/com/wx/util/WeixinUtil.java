@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 类名: WeixinUtil </br>
- * 包名： com.souvc.weixin.util
+ * 包名： com.wx.util
  * 描述: 公众平台通用接口工具类 </br>
- * 开发人员： souvc  </br>
- * 创建时间：  2015-12-1 </br>
+ * 开发人员： 六  </br>
+ * 创建时间：  2018-8-9 </br>
  * 发布版本：V1.0  </br>
  */
 public class WeixinUtil {

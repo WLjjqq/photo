@@ -1,7 +1,7 @@
 package com.wx.bean;
 
 /**
- * AccessToken的数据模型
+ * 封装token类。微信通用接口凭证。
  */
 public class AccessToken {
     //获取到的凭证

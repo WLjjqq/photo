@@ -3,19 +3,15 @@ package com.wx.servlet;
 
 import com.wx.bean.AccessToken;
 import com.wx.bean.Ttoken;
-import com.wx.mapper.TtokenMapper;
 import com.wx.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Date;
 
 /**
  * 类名: TokenThread </br>
  * 描述: 定时获取微信access_token的线程 </br>
- * 开发人员： souvc </br>
- * 创建时间：  Oct 6, 2015 </br>
+ * 开发人员： 六 </br>
+ * 创建时间：  2018-8-9 </br>
  * 发布版本：V1.0  </br>
  */
 public class TokenThread implements Runnable {

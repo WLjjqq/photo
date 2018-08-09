@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 /**
  * 类名: CommonUtil </br>
  * 描述: 通用工具类 </br>
- * 开发人员： souvc </br>
- * 创建时间：  2015-9-30 </br>
+ * 开发人员： 六 </br>
+ * 创建时间：  2018-8-9 </br>
  * 发布版本：V1.0  </br>
  */
 public class CommonUtil {
