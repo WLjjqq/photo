@@ -1,15 +1,17 @@
 package com.wx.controller;
 
-
-import com.wx.util.SignUtil;
+import com.wx.bean.FirstValidation;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
-import java.util.Enumeration;
+import java.security.MessageDigest;
+import java.util.Arrays;
+
 
 @RequestMapping("/wechat")
 @Controller
@@ -17,37 +19,67 @@ public class WechatController {
 
     private static Logger logger = Logger.getLogger(WechatController.class);
 
-    private static String WECHAT_TOKEN = "jinsanpang";
+    @ResponseBody
+    @RequestMapping(value = "/core", method = RequestMethod.GET)
+    public String coreByGet(FirstValidation validation, Model model, HttpServletRequest request) {
 
-    @RequestMapping(value = "/wx.do")
-    public void get(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        logger.info("微信开始验证服务器地址的有效性..........................");
 
-        logger.error("WechatController   ----   WechatController");
-
-        System.out.println("========WechatController========= ");
-        logger.info("请求进来了...");
-
-        Enumeration pNames = request.getParameterNames();
-        while (pNames.hasMoreElements()) {
-            String name = (String) pNames.nextElement();
-            String value = request.getParameter(name);
-            // out.print(name + "=" + value);
-
-            String log = "name =" + name + "     value =" + value;
-            logger.error(log);
+        // 3. 开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
+        if (checkSignatureIsTrue(validation)) {
+            logger.info("加密后的字符串与Signature一致，接入成功......................");
+            return validation.getEchostr();
+        } else {
+            logger.info("加密后的字符串与Signature不一致，接入失败......................");
+            //logger.info("访问者IP：" + HttpUtils.getIpAddr(request));
+            return "";
         }
-
-        String signature = request.getParameter("signature");/// 微信加密签名
-        String timestamp = request.getParameter("timestamp");/// 时间戳
-        String nonce = request.getParameter("nonce"); /// 随机数
-        String echostr = request.getParameter("echostr"); // 随机字符串
-        PrintWriter out = response.getWriter();
-
-        if (SignUtil.checkSignature(signature, timestamp, nonce)) {
-            out.print(echostr);
-        }
-        out.close();
-        out = null;
     }
 
+    @RequestMapping(value = "/core", method = RequestMethod.POST)
+    public String coreByPost(Model model) {
+        return "";
+    }
+
+    /**
+     * @param validation
+     * @return 加密后的字符串
+     * @Description: 加密/校验流程如下：
+     */
+    private static boolean checkSignatureIsTrue(FirstValidation validation) {
+        boolean flag = false;
+        try {
+            // 1. 将token、timestamp、nonce三个参数进行字典序排序
+            String[] strs = new String[] { validation.getToken(), validation.getNonce(), validation.getTimestamp() };
+            Arrays.sort(strs);
+
+            // 2. 将三个参数字符串拼接成一个字符串进行sha1加密
+            StringBuilder appendStr = new StringBuilder();
+            for (int i = 0; i < strs.length; i++) {
+                appendStr.append(strs[i]);
+            }
+
+            StringBuffer signature = new StringBuffer();
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            byte[] bytes = digest.digest(appendStr.toString().getBytes());
+
+            // 字节数组转换为十六进制数
+            for (int i = 0; i < bytes.length; i++) {
+                String shaHex = Integer.toHexString(bytes[i] & 0xFF);
+                if (shaHex.length() < 2) {
+                    signature.append(0);
+                }
+                signature.append(shaHex);
+            }
+
+            if (validation.getSignature().equals(signature.toString())) {
+                flag = true;
+            }
+
+        } catch (Exception e) {
+            logger.error("验证服务器地址的有效性时加密出现错误");
+
+        }
+        return flag;
+    }
 }
